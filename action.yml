@@ -120,6 +120,12 @@ runs:
       run: |
         fuzz-up user login
 
+    - name: Validate bundle
+      if: ${{ inputs.type == 'bundle' }}
+      shell: bash
+      run: |
+        fuzz-up bundle validate ${{ inputs.path }}
+
     - name: Upload to FuzzCorp
       shell: bash
       run: |
