@@ -16,6 +16,10 @@ inputs:
     description: 'Arguments/flags to pass to `fuzz-up upload`'
     required: false
     default: ''
+  notify_slack:
+    description: 'Send stats to Slack after upload (requires SLACK_WEBHOOK env var)'
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -64,6 +68,12 @@ runs:
         # Validate required environment variables
         if [ -z "$FUZZ_API_ORIGIN" ] || [ -z "$FUZZ_ORGANIZATION" ] || [ -z "$FUZZ_PROJECT" ] || [ -z "$FUZZ_USER" ] || [ -z "$FUZZ_PASSWORD" ]; then
           echo "Error: Missing required FuzzCorp credentials. Set FUZZ_API_ORIGIN, FUZZ_ORGANIZATION, FUZZ_PROJECT, FUZZ_USER, and FUZZ_PASSWORD environment variables."
+          exit 1
+        fi
+
+        # Validate SLACK_WEBHOOK if notify_slack is enabled
+        if [ "${{ inputs.notify_slack }}" = "true" ] && [ -z "$SLACK_WEBHOOK" ]; then
+          echo "Error: SLACK_WEBHOOK environment variable is required when notify_slack is enabled"
           exit 1
         fi
 
@@ -165,3 +175,14 @@ runs:
         UPLOAD_ARGS: ${{ inputs.args }}
       run: |
         fuzz-up upload "$UPLOAD_TYPE" "$UPLOAD_PATH" $UPLOAD_ARGS
+        
+    - name: Post FuzzCorp stats to slack
+      if: ${{ inputs.notify_slack == 'true' }}
+      shell: bash
+      run: |
+        repros="$(fuzz-up list repros --json | jq '.Data | length')"
+        errors="$(fuzz-up list errors --json | jq '.Errors | length')"
+
+        curl -XPOST -H 'Content-type: application/json' \
+            --data "{\"text\": \"Stats for ${{ inputs.upload_path }}.\n\nCrashes: $repros\nErrors: $errors\"}" \
+            "$SLACK_WEBHOOK"

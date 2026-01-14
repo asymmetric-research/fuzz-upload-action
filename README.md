@@ -25,6 +25,7 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
 | `type` | Yes | Type of data to upload: `asset`, `bundle`, or `corpus` |
 | `path` | Yes | Path to the file or directory to upload |
 | `args` | No | Additional arguments/flags to pass to `fuzz-up upload` |
+| `notify_slack` | No | Send crash/error stats to Slack (requires `SLACK_WEBHOOK` env var) |
 
 ## Environment Variables
 
@@ -37,6 +38,7 @@ All FuzzCorp credentials must be set as environment variables:
 | `FUZZ_PROJECT` | Yes | Your FuzzCorp project name |
 | `FUZZ_USER` | Yes | FuzzCorp username |
 | `FUZZ_PASSWORD` | Yes | FuzzCorp password |
+| `SLACK_WEBHOOK` | No | Slack webhook URL (required if `notify_slack: true`) |
 
 ## Type-Specific Requirements
 
@@ -78,6 +80,21 @@ Bundle uploads don't require additional flags:
     # ... environment variables
 ```
 
+## Slack Notifications
+
+Enable Slack notifications to receive crash and error stats after upload:
+
+```yaml
+- uses: asymmetric-research/fuzz-upload-action@v1
+  with:
+    type: bundle
+    path: ./bundle.zip
+    notify_slack: true
+  env:
+    SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    # ... other environment variables
+```
+
 ## Platform Support
 
 This action supports:
@@ -109,10 +126,12 @@ jobs:
         with:
           type: bundle
           path: ./build/fuzz-bundle.zip
+          notify_slack: true
         env:
           FUZZ_API_ORIGIN: ${{ secrets.FUZZ_API_ORIGIN }}
           FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
           FUZZ_PROJECT: ${{ secrets.FUZZ_PROJECT }}
           FUZZ_USER: ${{ secrets.FUZZ_USER }}
           FUZZ_PASSWORD: ${{ secrets.FUZZ_PASSWORD }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 ```
