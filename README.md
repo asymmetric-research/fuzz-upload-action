@@ -8,8 +8,8 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
 - name: Upload Fuzz Bundle
   uses: asymmetric-research/fuzz-upload-action@v1
   with:
-    type: bundle
-    path: ./path/to/fuzz-bundle.zip
+    upload_type: bundle
+    upload_path: ./path/to/fuzz-bundle.zip
   env:
     FUZZ_API_ORIGIN: ${{ secrets.FUZZ_API_ORIGIN }}
     FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
@@ -22,9 +22,9 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
 
 | Input | Required | Description |
 |-------|----------|-------------|
-| `type` | Yes | Type of data to upload: `asset`, `bundle`, or `corpus` |
-| `path` | Yes | Path to the file or directory to upload |
-| `args` | No | Additional arguments/flags to pass to `fuzz-up upload` |
+| `upload_type` | Yes | Type of data to upload: `asset`, `bundle`, or `corpus` |
+| `upload_path` | Yes | Path to the file or directory to upload |
+| `upload_args` | No | Additional arguments/flags to pass to `fuzz-up upload` |
 
 ## Environment Variables
 
@@ -46,9 +46,9 @@ When uploading assets, you must include the `--lineage` flag:
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
-    type: asset
-    path: ./binary
-    args: --lineage my-lineage-name
+    upload_type: asset
+    upload_path: ./binary
+    upload_args: --lineage my-lineage-name
   env:
     # ... environment variables
 ```
@@ -59,9 +59,9 @@ When uploading corpus data, you must include the `--seed-corpus-group` flag:
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
-    type: corpus
-    path: ./corpus/
-    args: --seed-corpus-group my-corpus-group
+    upload_type: corpus
+    upload_path: ./corpus/
+    upload_args: --seed-corpus-group my-corpus-group
   env:
     # ... environment variables
 ```
@@ -72,8 +72,8 @@ Bundle uploads don't require additional flags:
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
-    type: bundle
-    path: ./bundle.zip
+    upload_type: bundle
+    upload_path: ./bundle.zip
   env:
     # ... environment variables
 ```
@@ -107,8 +107,8 @@ jobs:
       - name: Upload to FuzzCorp
         uses: asymmetric-research/fuzz-upload-action@v1
         with:
-          type: bundle
-          path: ./build/fuzz-bundle.zip
+          upload_type: bundle
+          upload_path: ./build/fuzz-bundle.zip
         env:
           FUZZ_API_ORIGIN: ${{ secrets.FUZZ_API_ORIGIN }}
           FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
