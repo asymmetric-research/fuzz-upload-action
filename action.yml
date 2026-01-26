@@ -6,13 +6,13 @@ branding:
   color: blue
 
 inputs:
-  type:
+  upload_type:
     description: 'Type of data to upload (asset|bundle|corpus)'
     required: true
-  path:
+  upload_path:
     description: Path to file/directory to upload
     required: true
-  args:
+  upload_args:
     description: 'Arguments/flags to pass to `fuzz-up upload`'
     required: false
     default: ''
@@ -22,41 +22,45 @@ runs:
   steps:
     - name: Validate inputs
       shell: bash
+      env:
+        UPLOAD_TYPE: ${{ inputs.upload_type }}
+        UPLOAD_PATH: ${{ inputs.upload_path }}
+        UPLOAD_ARGS: ${{ inputs.upload_args }}
       run: |
         # Validate type input
-        case "${{ inputs.type }}" in
+        case "$UPLOAD_TYPE" in
           asset|bundle|corpus)
-            echo "Type: ${{ inputs.type }}"
+            echo "Type: $UPLOAD_TYPE"
             ;;
           *)
-            echo "Error: Invalid type '${{ inputs.type }}'. Must be one of: asset, bundle, corpus"
+            echo "Error: Invalid type '$UPLOAD_TYPE'. Must be one of: asset, bundle, corpus"
             exit 1
             ;;
         esac
 
         # Validate path exists
-        if [ ! -e "${{ inputs.path }}" ]; then
-          echo "Error: Path '${{ inputs.path }}' does not exist"
+        if [ ! -e "$UPLOAD_PATH" ]; then
+          echo "Error: Path '$UPLOAD_PATH' does not exist"
           exit 1
         fi
 
         # Validate required flags
-        if [ "${{ inputs.type }}" = "corpus" ]; then
-          if ! echo "${{ inputs.args }}" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
+        if [ "$UPLOAD_TYPE" = "corpus" ]; then
+          if ! echo "$UPLOAD_ARGS" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Corpus uploads must include '--seed-corpus-group <value>' or '--seed-corpus-group=<value>'"
             exit 1
           fi
         fi
 
-        if [ "${{ inputs.type }}" = "asset" ]; then
-          if ! echo "${{ inputs.args }}" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
+        if [ "$UPLOAD_TYPE" = "asset" ]; then
+          if ! echo "$UPLOAD_ARGS" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Asset uploads args must include '--lineage <value>' or '--lineage=<value>'"
             exit 1
           fi
         fi
 
-        echo "Path: ${{ inputs.path }}"
-        echo "Args: ${{ inputs.args }}"
+        echo "Path: $UPLOAD_PATH"
+        echo "Args: $UPLOAD_ARGS"
     
     - name: Validate env
       shell: bash
@@ -150,18 +154,18 @@ runs:
         fuzz-up user login
 
     - name: Validate bundle
-      if: ${{ inputs.type == 'bundle' }}
+      if: ${{ inputs.upload_type == 'bundle' }}
       shell: bash
       env: 
-        UPLOAD_PATH: ${{ inputs.path }}
+        UPLOAD_PATH: ${{ inputs.upload_path }}
       run: |
-        fuzz-up bundle validate $UPLOAD_PATH
+        fuzz-up bundle validate "$UPLOAD_PATH"
 
     - name: Upload to FuzzCorp
       shell: bash
       env:
-        UPLOAD_TYPE: ${{ inputs.type }}
-        UPLOAD_PATH: ${{ inputs.path }}
-        UPLOAD_ARGS: ${{ inputs.args }}
+        UPLOAD_TYPE: ${{ inputs.upload_type }}
+        UPLOAD_PATH: ${{ inputs.upload_path }}
+        UPLOAD_ARGS: ${{ inputs.upload_args }}
       run: |
         fuzz-up upload "$UPLOAD_TYPE" "$UPLOAD_PATH" $UPLOAD_ARGS
