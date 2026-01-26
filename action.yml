@@ -22,41 +22,45 @@ runs:
   steps:
     - name: Validate inputs
       shell: bash
+      env:
+        UPLOAD_TYPE: ${{ inputs.upload_type }}
+        UPLOAD_PATH: ${{ inputs.upload_path }}
+        UPLOAD_ARGS: ${{ inputs.upload_args }}
       run: |
         # Validate type input
-        case "${{ inputs.upload_type }}" in
+        case "$UPLOAD_TYPE" in
           asset|bundle|corpus)
-            echo "Type: ${{ inputs.upload_type }}"
+            echo "Type: $UPLOAD_TYPE"
             ;;
           *)
-            echo "Error: Invalid type '${{ inputs.upload_type }}'. Must be one of: asset, bundle, corpus"
+            echo "Error: Invalid type '$UPLOAD_TYPE'. Must be one of: asset, bundle, corpus"
             exit 1
             ;;
         esac
 
         # Validate path exists
-        if [ ! -e "${{ inputs.upload_path }}" ]; then
-          echo "Error: Path '${{ inputs.upload_path }}' does not exist"
+        if [ ! -e "$UPLOAD_PATH" ]; then
+          echo "Error: Path '$UPLOAD_PATH' does not exist"
           exit 1
         fi
 
         # Validate required flags
-        if [ "${{ inputs.upload_type }}" = "corpus" ]; then
-          if ! echo "${{ inputs.upload_args }}" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
+        if [ "$UPLOAD_TYPE" = "corpus" ]; then
+          if ! echo "$UPLOAD_ARGS" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Corpus uploads must include '--seed-corpus-group <value>' or '--seed-corpus-group=<value>'"
             exit 1
           fi
         fi
 
-        if [ "${{ inputs.upload_type }}" = "asset" ]; then
-          if ! echo "${{ inputs.upload_args }}" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
+        if [ "$UPLOAD_TYPE" = "asset" ]; then
+          if ! echo "$UPLOAD_ARGS" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Asset uploads args must include '--lineage <value>' or '--lineage=<value>'"
             exit 1
           fi
         fi
 
-        echo "Path: ${{ inputs.upload_path }}"
-        echo "Args: ${{ inputs.upload_args }}"
+        echo "Path: $UPLOAD_PATH"
+        echo "Args: $UPLOAD_ARGS"
     
     - name: Validate env
       shell: bash
@@ -155,7 +159,7 @@ runs:
       env: 
         UPLOAD_PATH: ${{ inputs.upload_path }}
       run: |
-        fuzz-up bundle validate $UPLOAD_PATH
+        fuzz-up bundle validate "$UPLOAD_PATH"
 
     - name: Upload to FuzzCorp
       shell: bash
