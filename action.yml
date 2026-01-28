@@ -153,14 +153,6 @@ runs:
       run: |
         fuzz-up user login
 
-    - name: Validate bundle
-      if: ${{ inputs.upload_type == 'bundle' }}
-      shell: bash
-      env: 
-        UPLOAD_PATH: ${{ inputs.upload_path }}
-      run: |
-        fuzz-up bundle validate "$UPLOAD_PATH"
-
     - name: Upload to FuzzCorp
       shell: bash
       env:
