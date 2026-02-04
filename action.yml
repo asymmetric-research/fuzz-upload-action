@@ -45,14 +45,14 @@ runs:
         fi
 
         # Validate required flags
-        if [ "$UPLOAD_TYPE" = "corpus" ]; then
+        if [ "$UPLOAD_TYPE" = "asset" ]; then
           if ! echo "$UPLOAD_ARGS" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Corpus uploads must include '--seed-corpus-group <value>' or '--seed-corpus-group=<value>'"
             exit 1
           fi
         fi
 
-        if [ "$UPLOAD_TYPE" = "asset" ]; then
+        if [ "$UPLOAD_TYPE" = "corpus" ]; then
           if ! echo "$UPLOAD_ARGS" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Asset uploads args must include '--lineage <value>' or '--lineage=<value>'"
             exit 1
@@ -161,4 +161,4 @@ runs:
         UPLOAD_PATH: ${{ inputs.upload_path }}
         UPLOAD_ARGS: ${{ inputs.upload_args }}
       run: |
-        fuzz-up upload "$UPLOAD_TYPE" "$UPLOAD_PATH" $UPLOAD_ARGS
+        fuzz-up upload "$UPLOAD_TYPE" "$UPLOAD_ARGS" "$UPLOAD_PATH"
