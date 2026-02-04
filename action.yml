@@ -109,6 +109,7 @@ runs:
       env:
         BINARY_NAME: fuzz-up_${{ steps.platform.outputs.os }}_${{ steps.platform.outputs.arch }}
         INSTALL_DIR: ${{ runner.temp }}/fuzz-up-bin
+        GH_TOKEN: ${{ github.token }}
       run: |
         echo "Downloading fuzz-up for ${{ steps.platform.outputs.os }} ${{ steps.platform.outputs.arch }}..."
 
