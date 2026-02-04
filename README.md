@@ -41,27 +41,27 @@ All FuzzCorp credentials must be set as environment variables:
 ## Type-Specific Requirements
 
 ### Asset Uploads
-When uploading assets, you must include the `--lineage` flag:
+When uploading assets, you must include the `--seed-corpus-group` flag:
 
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
     upload_type: asset
     upload_path: ./binary
-    upload_args: --lineage my-lineage-name
+    upload_args: --seed-corpus-group my-corpus-group
   env:
     # ... environment variables
 ```
 
 ### Corpus Uploads
-When uploading corpus data, you must include the `--seed-corpus-group` flag:
+When uploading corpus data, you must include the `--lineage` flag:
 
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
     upload_type: corpus
     upload_path: ./corpus/
-    upload_args: --seed-corpus-group my-corpus-group
+    upload_args: --lineage my-lineage-name
   env:
     # ... environment variables
 ```

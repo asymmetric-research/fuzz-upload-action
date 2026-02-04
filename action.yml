@@ -152,7 +152,7 @@ runs:
     - name: Log into FuzzCorp
       shell: bash
       run: |
-        fuzz-up user login
+        fuzz-up user login > /dev/null
 
     - name: Upload to FuzzCorp
       shell: bash
