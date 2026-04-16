@@ -20,11 +20,11 @@ GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
 
 ## Inputs
 
-| Input         | Required | Description                                            |
-|---------------|----------|--------------------------------------------------------|
-| `upload_type` | Yes      | Type of data to upload: `bundle` or `corpus`           |
-| `upload_path` | Yes      | Path to the file or directory to upload                |
-| `upload_args` | No       | Additional arguments/flags to pass to `fuzz-up upload` |
+| Input         | Required | Description                                                          |
+|---------------|----------|----------------------------------------------------------------------|
+| `upload_type` | Yes      | Type of data to upload: `bundle` or `corpus`                         |
+| `upload_path` | Yes      | Path to the file or directory to upload (relative to workspace root) |
+| `upload_args` | No       | Additional arguments/flags to pass to `fuzz-up upload`               |
 
 ## Environment Variables
 
@@ -49,7 +49,7 @@ kind (`main`, `seed`, or `delta`; defaults to `delta`):
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
     upload_type: corpus
-    upload_path: /path/to/corpus
+    upload_path: ./path/to/corpus
     upload_args: --lineage my-lineage-name --kind seed
   env:
     # ... environment variables
@@ -64,7 +64,7 @@ without uploading:
 - uses: asymmetric-research/fuzz-upload-action@v1
   with:
     upload_type: bundle
-    upload_path: /path/to/bundle
+    upload_path: ./path/to/bundle
   env:
     # ... environment variables
 ```
