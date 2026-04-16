@@ -7,7 +7,7 @@ branding:
 
 inputs:
   upload_type:
-    description: 'Type of data to upload (asset|bundle|corpus)'
+    description: 'Type of data to upload (bundle|corpus)'
     required: true
   upload_path:
     description: Path to file/directory to upload
@@ -29,11 +29,11 @@ runs:
       run: |
         # Validate type input
         case "$UPLOAD_TYPE" in
-          asset|bundle|corpus)
+          bundle|corpus)
             echo "Type: $UPLOAD_TYPE"
             ;;
           *)
-            echo "Error: Invalid type '$UPLOAD_TYPE'. Must be one of: asset, bundle, corpus"
+            echo "Error: Invalid type '$UPLOAD_TYPE'. Must be one of: bundle, corpus"
             exit 1
             ;;
         esac
@@ -48,13 +48,6 @@ runs:
         if [ "$UPLOAD_TYPE" = "corpus" ]; then
           if ! echo "$UPLOAD_ARGS" | grep -qE -- '--lineage([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
             echo "Error: Corpus uploads must include '--lineage <value>' or '--lineage=<value>'"
-            exit 1
-          fi
-        fi
-
-        if [ "$UPLOAD_TYPE" = "asset" ]; then
-          if ! echo "$UPLOAD_ARGS" | grep -qE -- '--seed-corpus-group([[:space:]]+[^[:space:]-]|=[^[:space:]]+)'; then
-            echo "Error: Asset uploads must include '--seed-corpus-group <value>' or '--seed-corpus-group=<value>'"
             exit 1
           fi
         fi
