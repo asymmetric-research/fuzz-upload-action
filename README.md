@@ -1,6 +1,6 @@
 # Fuzz Upload Action
 
-GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
+GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
 
 ## Usage
 
@@ -9,7 +9,7 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
   uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: bundle
-    upload_path: ./path/to/fuzz-bundle.zip
+    upload_path: ./path/to/fuzz-bundle
   env:
     FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
     FUZZ_PROJECT: ${{ secrets.FUZZ_PROJECT }}
@@ -18,11 +18,11 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
 
 ## Inputs
 
-| Input | Required | Description |
-|-------|----------|-------------|
-| `upload_type` | Yes | Type of data to upload: `asset`, `bundle`, or `corpus` |
-| `upload_path` | Yes | Path to the file or directory to upload |
-| `upload_args` | No | Additional arguments/flags to pass to `fuzz-up upload` |
+| Input         | Required | Description                                                          |
+|---------------|----------|----------------------------------------------------------------------|
+| `upload_type` | Yes      | Type of data to upload: `bundle` or `corpus`                         |
+| `upload_path` | Yes      | Path to the file or directory to upload (relative to workspace root) |
+| `upload_args` | No       | Additional arguments/flags to pass to `fuzz-up upload`               |
 
 ## Environment Variables
 
@@ -36,40 +36,31 @@ All FuzzCorp credentials must be set as environment variables:
 
 ## Type-Specific Requirements
 
-### Asset Uploads
-When uploading assets, you must include the `--seed-corpus-group` flag:
-
-```yaml
-- uses: asymmetric-research/fuzz-upload-action@v2
-  with:
-    upload_type: asset
-    upload_path: ./binary
-    upload_args: --seed-corpus-group my-corpus-group
-  env:
-    # ... environment variables
-```
-
 ### Corpus Uploads
-When uploading corpus data, you must include the `--lineage` flag:
+
+When uploading corpus data, you must include the `--lineage` flag. You may also specify `--kind` to set the corpus
+kind (`main`, `seed`, or `delta`; defaults to `delta`):
 
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: corpus
-    upload_path: ./corpus/
-    upload_args: --lineage my-lineage-name
+    upload_path: ./path/to/corpus
+    upload_args: --lineage my-lineage-name --kind seed
   env:
     # ... environment variables
 ```
 
 ### Bundle Uploads
-Bundle uploads don't require additional flags:
+
+Bundle uploads don't require additional flags. You can pass `--validate-only` to validate the bundle manifest
+without uploading:
 
 ```yaml
 - uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: bundle
-    upload_path: ./bundle.zip
+    upload_path: ./path/to/bundle
   env:
     # ... environment variables
 ```
