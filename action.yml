@@ -66,8 +66,8 @@ runs:
       shell: bash
       run: |
         # Validate required environment variables
-        if [ -z "$FUZZ_API_ORIGIN" ] || [ -z "$FUZZ_ORGANIZATION" ] || [ -z "$FUZZ_PROJECT" ] || [ -z "$FUZZ_USER" ] || [ -z "$FUZZ_PASSWORD" ]; then
-          echo "Error: Missing required FuzzCorp credentials. Set FUZZ_API_ORIGIN, FUZZ_ORGANIZATION, FUZZ_PROJECT, FUZZ_USER, and FUZZ_PASSWORD environment variables."
+        if [ -z "$FUZZ_ORGANIZATION" ] || [ -z "$FUZZ_PROJECT" ] || [ -z "$FUZZ_API_KEY" ]; then
+          echo "Error: Missing required FuzzCorp credentials. Set FUZZ_API_KEY, FUZZ_ORGANIZATION, and FUZZ_PROJECT environment variables."
           exit 1
         fi
 
@@ -148,11 +148,6 @@ runs:
         rm -f cosign.pub "${BINARY_NAME}.sig"
 
         echo "fuzz-up downloaded and verified successfully"
-
-    - name: Log into FuzzCorp
-      shell: bash
-      run: |
-        fuzz-up user login > /dev/null
 
     - name: Upload to FuzzCorp
       shell: bash

@@ -6,16 +6,14 @@ GitHub Action to upload fuzzing data (assets, bundles, or corpus) to FuzzCorp.
 
 ```yaml
 - name: Upload Fuzz Bundle
-  uses: asymmetric-research/fuzz-upload-action@v1
+  uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: bundle
     upload_path: ./path/to/fuzz-bundle.zip
   env:
-    FUZZ_API_ORIGIN: ${{ secrets.FUZZ_API_ORIGIN }}
     FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
     FUZZ_PROJECT: ${{ secrets.FUZZ_PROJECT }}
-    FUZZ_USER: ${{ secrets.FUZZ_USER }}
-    FUZZ_PASSWORD: ${{ secrets.FUZZ_PASSWORD }}
+    FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
 ```
 
 ## Inputs
@@ -32,11 +30,9 @@ All FuzzCorp credentials must be set as environment variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `FUZZ_API_ORIGIN` | Yes | FuzzCorp API origin URL |
 | `FUZZ_ORGANIZATION` | Yes | Your FuzzCorp organization name |
 | `FUZZ_PROJECT` | Yes | Your FuzzCorp project name |
-| `FUZZ_USER` | Yes | FuzzCorp username |
-| `FUZZ_PASSWORD` | Yes | FuzzCorp password |
+| `FUZZ_API_KEY` | Yes | FuzzCorp API key |
 
 ## Type-Specific Requirements
 
@@ -44,7 +40,7 @@ All FuzzCorp credentials must be set as environment variables:
 When uploading assets, you must include the `--seed-corpus-group` flag:
 
 ```yaml
-- uses: asymmetric-research/fuzz-upload-action@v1
+- uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: asset
     upload_path: ./binary
@@ -57,7 +53,7 @@ When uploading assets, you must include the `--seed-corpus-group` flag:
 When uploading corpus data, you must include the `--lineage` flag:
 
 ```yaml
-- uses: asymmetric-research/fuzz-upload-action@v1
+- uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: corpus
     upload_path: ./corpus/
@@ -70,7 +66,7 @@ When uploading corpus data, you must include the `--lineage` flag:
 Bundle uploads don't require additional flags:
 
 ```yaml
-- uses: asymmetric-research/fuzz-upload-action@v1
+- uses: asymmetric-research/fuzz-upload-action@v2
   with:
     upload_type: bundle
     upload_path: ./bundle.zip
@@ -105,14 +101,12 @@ jobs:
         run: ./scripts/build-fuzz-bundle.sh
 
       - name: Upload to FuzzCorp
-        uses: asymmetric-research/fuzz-upload-action@v1
+        uses: asymmetric-research/fuzz-upload-action@v2
         with:
           upload_type: bundle
           upload_path: ./build/fuzz-bundle.zip
         env:
-          FUZZ_API_ORIGIN: ${{ secrets.FUZZ_API_ORIGIN }}
           FUZZ_ORGANIZATION: ${{ secrets.FUZZ_ORGANIZATION }}
           FUZZ_PROJECT: ${{ secrets.FUZZ_PROJECT }}
-          FUZZ_USER: ${{ secrets.FUZZ_USER }}
-          FUZZ_PASSWORD: ${{ secrets.FUZZ_PASSWORD }}
+          FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
 ```
