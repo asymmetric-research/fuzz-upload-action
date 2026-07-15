@@ -28,11 +28,11 @@ GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
 
 All FuzzCorp credentials must be set as environment variables:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `FUZZ_ORGANIZATION` | Yes | Your FuzzCorp organization name |
-| `FUZZ_PROJECT` | Yes | Your FuzzCorp project name |
-| `FUZZ_API_KEY` | Yes | FuzzCorp API key |
+| Variable            | Required | Description                     |
+|---------------------|----------|---------------------------------|
+| `FUZZ_ORGANIZATION` | Yes      | Your FuzzCorp organization name |
+| `FUZZ_PROJECT`      | Yes      | Your FuzzCorp project name      |
+| `FUZZ_API_KEY`      | Yes      | FuzzCorp API key                |
 
 ## Type-Specific Requirements
 

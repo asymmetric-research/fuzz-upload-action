@@ -142,6 +142,9 @@ runs:
 
         echo "fuzz-up downloaded and verified successfully"
 
+        # Report version
+        "$INSTALL_DIR/fuzz-up" version
+
     - name: Upload to FuzzCorp
       shell: bash
       env:
