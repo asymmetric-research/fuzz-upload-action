@@ -108,7 +108,7 @@ runs:
       run: |
         echo "Downloading fuzz-up for ${{ steps.platform.outputs.os }} ${{ steps.platform.outputs.arch }}..."
 
-        if ! gh release download --repo asymmetric-research/fuzz-up --pattern "$BINARY_NAME" --pattern "attestations.sigstore.json" --dir "$DOWNLOAD_DIR"; then
+        if ! gh release download --repo asymmetric-research/fuzz-up --pattern "$BINARY_NAME" --pattern "attestations.sigstore.json" --dir "$DOWNLOAD_DIR" --clobber; then
           echo "Error: Failed to download fuzz-up release"
           exit 1
         fi
@@ -133,7 +133,7 @@ runs:
         if ! gh attestation verify "$DOWNLOAD_DIR/$BINARY_NAME" \
             --bundle "$DOWNLOAD_DIR/attestations.sigstore.json" \
             --repo asymmetric-research/fuzzcorp \
-            --cert-identity-regex '^https://github\.com/asymmetric-research/fuzzcorp/\.github/workflows/fuzz-up-release\.yml@refs/.+$' \
+            --cert-identity-regex '^https://github\.com/asymmetric-research/fuzzcorp/\.github/workflows/fuzz-up-release\.yml@refs/tags/.+$' \
             --deny-self-hosted-runners; then
           echo "Error: Attestation verification failed for fuzz-up binary"
           exit 1
