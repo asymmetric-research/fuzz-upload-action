@@ -54,7 +54,7 @@ runs:
 
         echo "Path: $UPLOAD_PATH"
         echo "Args: $UPLOAD_ARGS"
-    
+
     - name: Validate env
       shell: bash
       run: |
@@ -70,10 +70,10 @@ runs:
       run: |
         case "${{ runner.os }}" in
           Linux)
-            echo "os=linux" >> "$GITHUB_OUTPUT"
+            os=linux
             ;;
           macOS)
-            echo "os=darwin" >> "$GITHUB_OUTPUT"
+            os=darwin
             ;;
           *)
             echo "Error: Unsupported OS '${{ runner.os }}'. fuzz-up only supports Linux and macOS."
@@ -83,10 +83,10 @@ runs:
 
         case "${{ runner.arch }}" in
           X64)
-            echo "arch=amd64" >> "$GITHUB_OUTPUT"
+            arch=amd64
             ;;
           ARM64)
-            echo "arch=arm64" >> "$GITHUB_OUTPUT"
+            arch=arm64
             ;;
           *)
             echo "Error: Unsupported architecture '${{ runner.arch }}'. fuzz-up only supports X64 (amd64) and ARM64."
@@ -94,53 +94,62 @@ runs:
             ;;
         esac
 
-    - name: Install cosign
-      uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad #v4.0.0
+        echo "os=$os" >> "$GITHUB_OUTPUT"
+        echo "arch=$arch" >> "$GITHUB_OUTPUT"
+        echo "binary_name=fuzz-up_${os}_${arch}" >> "$GITHUB_OUTPUT"
+        echo "download_dir=$RUNNER_TEMP/fuzz-up-download" >> "$GITHUB_OUTPUT"
 
     - name: Download fuzz-up
       shell: bash
       env:
-        BINARY_NAME: fuzz-up_${{ steps.platform.outputs.os }}_${{ steps.platform.outputs.arch }}
-        INSTALL_DIR: ${{ runner.temp }}/fuzz-up-bin
+        BINARY_NAME: ${{ steps.platform.outputs.binary_name }}
+        DOWNLOAD_DIR: ${{ steps.platform.outputs.download_dir }}
         GH_TOKEN: ${{ github.token }}
       run: |
         echo "Downloading fuzz-up for ${{ steps.platform.outputs.os }} ${{ steps.platform.outputs.arch }}..."
 
-        if ! gh release download --repo asymmetric-research/fuzz-up --pattern "$BINARY_NAME" --pattern "${BINARY_NAME}.sig"; then
+        if ! gh release download --repo asymmetric-research/fuzz-up --pattern "$BINARY_NAME" --pattern "attestations.sigstore.json" --dir "$DOWNLOAD_DIR" --clobber; then
           echo "Error: Failed to download fuzz-up release"
           exit 1
         fi
 
-        if [ ! -f "$BINARY_NAME" ]; then
+        if [ ! -f "$DOWNLOAD_DIR/$BINARY_NAME" ]; then
           echo "Error: Downloaded file '$BINARY_NAME' not found"
           exit 1
         fi
 
-        if [ ! -f "${BINARY_NAME}.sig" ]; then
-          echo "Error: Signature file '${BINARY_NAME}.sig' not found"
+        if [ ! -f "$DOWNLOAD_DIR/attestations.sigstore.json" ]; then
+          echo "Error: Attestation bundle 'attestations.sigstore.json' not found"
           exit 1
         fi
 
-        if ! gh api repos/asymmetric-research/fuzz-up/contents/cosign.pub --jq '.content' | base64 -d > cosign.pub; then
-          echo "Error: Failed to download cosign public key"
+    - name: Verify fuzz-up attestation
+      shell: bash
+      env:
+        BINARY_NAME: ${{ steps.platform.outputs.binary_name }}
+        DOWNLOAD_DIR: ${{ steps.platform.outputs.download_dir }}
+      run: |
+        echo "Verifying fuzz-up build-provenance attestation..."
+        if ! gh attestation verify "$DOWNLOAD_DIR/$BINARY_NAME" \
+            --bundle "$DOWNLOAD_DIR/attestations.sigstore.json" \
+            --repo asymmetric-research/fuzzcorp \
+            --cert-identity-regex '^https://github\.com/asymmetric-research/fuzzcorp/\.github/workflows/fuzz-up-release\.yml@refs/tags/.+$' \
+            --deny-self-hosted-runners; then
+          echo "Error: Attestation verification failed for fuzz-up binary"
           exit 1
         fi
 
-        echo "Verifying fuzz-up signature..."
-        if ! cosign verify-blob --key cosign.pub --signature "${BINARY_NAME}.sig" "$BINARY_NAME"; then
-          echo "Error: Signature verification failed for fuzz-up binary"
-          exit 1
-        fi
-
+    - name: Install fuzz-up
+      shell: bash
+      env:
+        BINARY_NAME: ${{ steps.platform.outputs.binary_name }}
+        DOWNLOAD_DIR: ${{ steps.platform.outputs.download_dir }}
+        INSTALL_DIR: ${{ runner.temp }}/fuzz-up-bin
+      run: |
         mkdir -p "$INSTALL_DIR"
-        mv "$BINARY_NAME" "$INSTALL_DIR/fuzz-up"
+        mv "$DOWNLOAD_DIR/$BINARY_NAME" "$INSTALL_DIR/fuzz-up"
         chmod +x "$INSTALL_DIR/fuzz-up"
         echo "$INSTALL_DIR" >> "$GITHUB_PATH"
-
-        # Cleanup verification files
-        rm -f cosign.pub "${BINARY_NAME}.sig"
-
-        echo "fuzz-up downloaded and verified successfully"
 
         # Report version
         "$INSTALL_DIR/fuzz-up" version
