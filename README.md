@@ -24,6 +24,31 @@ GitHub Action to upload fuzzing data (bundles or corpus) to AR Fuzzing.
 | `upload_path` | Yes      | Path to the file or directory to upload (relative to workspace root) |
 | `upload_args` | No       | Additional arguments/flags to pass to `fuzz-up upload`               |
 
+## Outputs
+
+| Output         | Description                                     |
+|----------------|-------------------------------------------------|
+| `fuzz_up_path` | Absolute path to the installed `fuzz-up` binary |
+
+The action does not add `fuzz-up` to `PATH`. To run it in a later step, give the action step an `id` and pass this
+output through `env`:
+
+```yaml
+- id: upload
+  uses: asymmetric-research/fuzz-upload-action@v2
+  with:
+    upload_type: bundle
+    upload_path: ./path/to/bundle
+  env:
+    # ... environment variables
+
+- name: Check the API key
+  env:
+    FUZZ_UP: ${{ steps.upload.outputs.fuzz_up_path }}
+    FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
+  run: '"$FUZZ_UP" whoami'
+```
+
 ## Environment Variables
 
 All AR Fuzzing credentials must be set as environment variables:
