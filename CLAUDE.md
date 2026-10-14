@@ -19,7 +19,8 @@ The action executes these steps in order:
    releases via `gh` into a download directory under `runner.temp` (never the workspace)
 5. **Verification** — verifies the release's Sigstore attestation bundle with `gh attestation verify --bundle`
    (keyless, offline, bound to the fuzzcorp release workflow identity)
-6. **Install** — moves the verified binary to `runner.temp/fuzz-up-bin`, adds it to `PATH`, prints its version
+6. **Install** — moves the verified binary to `runner.temp/fuzz-up-bin` and prints its version; it is not added to
+   `PATH`, since writing to `GITHUB_PATH` lets later steps run code from that directory
 7. **Upload** — runs `fuzz-up upload <type> [args] <path>` (credentials are read from the environment)
 
 ## Development Notes
