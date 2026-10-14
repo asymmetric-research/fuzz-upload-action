@@ -25,6 +25,7 @@ The action executes these steps in order:
 
 ## Development Notes
 
-- There is no build step, test suite, or linter — this repo contains only `action.yml` and `README.md`.
+- There is no build step or test suite. `zizmor` audits the action and workflows in CI; run `zizmor .` locally before
+  pushing.
 - All inputs are passed to shell steps via environment variables (not inline interpolation) to prevent injection.
 - Changes should be tested by referencing the action from a workflow in another repo.
