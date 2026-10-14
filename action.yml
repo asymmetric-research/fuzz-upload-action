@@ -1,6 +1,6 @@
 name: Fuzz Upload Action
 author: Asymmetric Research
-description: Upload fuzzing data to FuzzCorp
+description: Upload fuzzing data to AR Fuzzing
 branding:
   icon: upload-cloud
   color: blue
@@ -60,7 +60,7 @@ runs:
       run: |
         # Validate required environment variables
         if [ -z "$FUZZ_ORGANIZATION" ] || [ -z "$FUZZ_PROJECT" ] || [ -z "$FUZZ_API_KEY" ]; then
-          echo "Error: Missing required FuzzCorp credentials. Set FUZZ_API_KEY, FUZZ_ORGANIZATION, and FUZZ_PROJECT environment variables."
+          echo "Error: Missing required AR Fuzzing credentials. Set FUZZ_API_KEY, FUZZ_ORGANIZATION, and FUZZ_PROJECT environment variables."
           exit 1
         fi
 
@@ -157,7 +157,7 @@ runs:
         # Report version
         "$INSTALL_DIR/fuzz-up" version
 
-    - name: Upload to FuzzCorp
+    - name: Upload to AR Fuzzing
       shell: bash
       env:
         FUZZ_UP: ${{ steps.install.outputs.path }}

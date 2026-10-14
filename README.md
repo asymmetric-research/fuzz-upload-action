@@ -1,6 +1,6 @@
 # Fuzz Upload Action
 
-GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
+GitHub Action to upload fuzzing data (bundles or corpus) to AR Fuzzing.
 
 ## Usage
 
@@ -26,13 +26,13 @@ GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
 
 ## Environment Variables
 
-All FuzzCorp credentials must be set as environment variables:
+All AR Fuzzing credentials must be set as environment variables:
 
-| Variable            | Required | Description                     |
-|---------------------|----------|---------------------------------|
-| `FUZZ_ORGANIZATION` | Yes      | Your FuzzCorp organization name |
-| `FUZZ_PROJECT`      | Yes      | Your FuzzCorp project name      |
-| `FUZZ_API_KEY`      | Yes      | FuzzCorp API key                |
+| Variable            | Required | Description                       |
+|---------------------|----------|-----------------------------------|
+| `FUZZ_ORGANIZATION` | Yes      | Your AR Fuzzing organization name |
+| `FUZZ_PROJECT`      | Yes      | Your AR Fuzzing project name      |
+| `FUZZ_API_KEY`      | Yes      | AR Fuzzing API key                |
 
 ## Type-Specific Requirements
 
@@ -91,7 +91,7 @@ jobs:
       - name: Build fuzz bundle
         run: ./scripts/build-fuzz-bundle.sh
 
-      - name: Upload to FuzzCorp
+      - name: Upload to AR Fuzzing
         uses: asymmetric-research/fuzz-upload-action@v2
         with:
           upload_type: bundle
