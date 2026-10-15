@@ -1,6 +1,6 @@
 # Fuzz Upload Action
 
-GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
+GitHub Action to upload fuzzing data (bundles or corpus) to AR Fuzzing.
 
 ## Usage
 
@@ -24,15 +24,40 @@ GitHub Action to upload fuzzing data (bundles or corpus) to FuzzCorp.
 | `upload_path` | Yes      | Path to the file or directory to upload (relative to workspace root) |
 | `upload_args` | No       | Additional arguments/flags to pass to `fuzz-up upload`               |
 
+## Outputs
+
+| Output         | Description                                     |
+|----------------|-------------------------------------------------|
+| `fuzz_up_path` | Absolute path to the installed `fuzz-up` binary |
+
+The action does not add `fuzz-up` to `PATH`. To run it in a later step, give the action step an `id` and pass this
+output through `env`:
+
+```yaml
+- id: upload
+  uses: asymmetric-research/fuzz-upload-action@v2
+  with:
+    upload_type: bundle
+    upload_path: ./path/to/bundle
+  env:
+    # ... environment variables
+
+- name: Check the API key
+  env:
+    FUZZ_UP: ${{ steps.upload.outputs.fuzz_up_path }}
+    FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
+  run: '"$FUZZ_UP" whoami'
+```
+
 ## Environment Variables
 
-All FuzzCorp credentials must be set as environment variables:
+All AR Fuzzing credentials must be set as environment variables:
 
-| Variable            | Required | Description                     |
-|---------------------|----------|---------------------------------|
-| `FUZZ_ORGANIZATION` | Yes      | Your FuzzCorp organization name |
-| `FUZZ_PROJECT`      | Yes      | Your FuzzCorp project name      |
-| `FUZZ_API_KEY`      | Yes      | FuzzCorp API key                |
+| Variable            | Required | Description                       |
+|---------------------|----------|-----------------------------------|
+| `FUZZ_ORGANIZATION` | Yes      | Your AR Fuzzing organization name |
+| `FUZZ_PROJECT`      | Yes      | Your AR Fuzzing project name      |
+| `FUZZ_API_KEY`      | Yes      | AR Fuzzing API key                |
 
 ## Type-Specific Requirements
 
@@ -91,7 +116,7 @@ jobs:
       - name: Build fuzz bundle
         run: ./scripts/build-fuzz-bundle.sh
 
-      - name: Upload to FuzzCorp
+      - name: Upload to AR Fuzzing
         uses: asymmetric-research/fuzz-upload-action@v2
         with:
           upload_type: bundle
